@@ -1,29 +1,34 @@
 package kulku.ua.imagerotation;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 
 public class MyActivity extends Activity {
 
-    public static final String STORAGE_EMULATED_0_DCIM_CAMERA = "/storage/emulated/0/DCIM/Camera/";
+    public static final String STORAGE_EMULATED_0_DCIM_CAMERA = "/storage/emulated/0/Download/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA +
-                "IMG_20141206_154528.jpg");
-        try {
-            new ImageRotator(file).rotateImage();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        ImageView imageContainer = (ImageView) findViewById(R.id.image_container);
+        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "cloud.jpg");
+//      ImageRotator imageRotator = new ImageSplitRotator(file);
+        RenderScriptImageRotator imageRotator = new RenderScriptImageRotator(file, this);
+//        try {
+//            imageRotator.rotateImage();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+        Bitmap blur = imageRotator.blur();
+        imageContainer.setImageBitmap(blur);
     }
 
 
