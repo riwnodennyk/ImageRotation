@@ -1,15 +1,17 @@
-package kulku.ua.imagerotation;
+package kulku.ua.imagerotation.rotator;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import kulku.ua.imagerotation.MyActivity;
+import kulku.ua.imagerotation.utils.Utils;
 
 /**
  * Created by aindrias on 06.01.2015.
@@ -18,7 +20,6 @@ public class ImageSplitRotator extends ImageRotator {
 
     public static final String TAG = ImageSplitRotator.class.getSimpleName();
     public final int mRowsCols;
-    private final BitmapFactory.Options mOptions;
     private final Matrix mRotateMatrix;
     private final Rotation mRotation;
     private int mOriginalHeight;
@@ -27,60 +28,49 @@ public class ImageSplitRotator extends ImageRotator {
     private int mChunkHeight;
     private int mChunkWidth;
 
-    public ImageSplitRotator(File targetFile) {
-        this(targetFile, 90);
-    }
-
-    public ImageSplitRotator(File targetFile, int angle) {
-        super(targetFile, angle);
+    ImageSplitRotator(File targetFile) {
+        super(targetFile, 90);
         mRowsCols = 3;
 
         mRotateMatrix = new Matrix();
         mRotateMatrix.postRotate(getAngle());
 
         mRotation = new Rotation(getAngle(), mRowsCols);
-
-        mOptions = new BitmapFactory.Options();
-        mOptions.inSampleSize = 1;
-        mOptions.inPurgeable = true;
-        mOptions.inInputShareable = true;
-        mOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
     }
 
-    public void rotateImage() throws FileNotFoundException {
-        long time = System.currentTimeMillis();
-        measureDimensions();
-        splitOriginalBitmap();
-        combineRotatedBitmap();
-        Log.d(TAG, "combined in " + (System.currentTimeMillis() - time));
+    public Bitmap rotatedImage() {
+        Bitmap combined = null;
+        try {
+            splitOriginalBitmap();
+            combined = combineRotatedBitmap();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return combined;
     }
 
-    private void measureDimensions() {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
 
-        BitmapFactory.decodeFile(getTargetFile().getPath(), options);
-        mOriginalHeight = options.outHeight;
-        mOriginalWidth = options.outWidth;
+    private void splitOriginalBitmap() throws FileNotFoundException {
+        Bitmap bitmap = getOriginalBitmap();
+        mOriginalHeight = bitmap.getHeight();
+        mOriginalWidth = bitmap.getWidth();
 
         mChunkHeight = mOriginalHeight / mRowsCols;
         mChunkWidth = mOriginalWidth / mRowsCols;
-    }
 
-    private void splitOriginalBitmap() throws FileNotFoundException {
         mRotatedPatches = new File[mRowsCols][mRowsCols];
-        Bitmap bitmap = BitmapFactory.decodeFile(getTargetFile().getPath(), mOptions);
         for (int yCoord = 0, y = 0; y < mRowsCols; y++, yCoord += mChunkHeight) {
             for (int xCoord = 0, x = 0; x < mRowsCols; x++, xCoord += mChunkWidth) {
                 Bitmap rotatedPatch = cutRotatedPatch(bitmap, xCoord, yCoord);
                 mRotatedPatches[x][y] = savePatch(rotatedPatch, x, y);
             }
         }
+        Utils.logHeap("splitOriginalBitmap");
         bitmap.recycle();
     }
 
 
-    private void combineRotatedBitmap() throws FileNotFoundException {
+    private Bitmap combineRotatedBitmap() throws FileNotFoundException {
         int rotatedHeight = (getAngle() == 0 || getAngle() == 180) ? mOriginalHeight : mOriginalWidth;
         int rotatedWidth = (getAngle() == 0 || getAngle() == 180) ? mOriginalWidth : mOriginalHeight;
 
@@ -96,25 +86,26 @@ public class ImageSplitRotator extends ImageRotator {
                 drawPatchOntoCanvas(canvas, x * rotatedChunkWidth, y * rotatedChunkHeight, file);
                 file.delete();
             }
-        FileOutputStream stream = null;
-        try {
-            stream = new FileOutputStream(getTargetFile());
-            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException e) {
-                    // do nothing here
-                }
-            }
-        }
-        rotatedBitmap.recycle();
+//        FileOutputStream stream = null;
+//        try {
+//            stream = new FileOutputStream(getOriginalFile());
+//            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+//        } finally {
+//            if (stream != null) {
+//                try {
+//                    stream.close();
+//                } catch (IOException e) {
+//                    // do nothing here
+//                }
+//            }
+//        }
+        Utils.logHeap("combineRotatedBitmap");
+        return rotatedBitmap;
     }
 
 
     private void drawPatchOntoCanvas(Canvas canvas, int xCoord, int yCoord, File patch) {
-        Bitmap bitmap = BitmapFactory.decodeFile(patch.getPath(), mOptions);
+        Bitmap bitmap = BitmapFactory.decodeFile(patch.getPath());
         canvas.drawBitmap(bitmap, xCoord, yCoord, null);
         bitmap.recycle();
     }
@@ -142,5 +133,50 @@ public class ImageSplitRotator extends ImageRotator {
 
     private Bitmap cutRotatedPatch(Bitmap bitmap, int xCoord, int yCoord) {
         return Bitmap.createBitmap(bitmap, xCoord, yCoord, mChunkWidth, mChunkHeight, mRotateMatrix, true);
+    }
+
+    /**
+     * Created by aindrias on 06.01.2015.
+     */
+    public static class Rotation {
+
+        private int mAngle;
+        private int mSize;
+
+        public Rotation(int angle, int size) {
+            mAngle = angle;
+            mSize = size;
+            //                alpha => after[x][y] = before[cos(alpha)x - sin(alpha) y ][sin(alpha)x + cos(alpha)y];
+        }
+
+        public int getX(int x, int y) {
+            switch (mAngle) {
+                case 0:
+                    return x;
+                case 90:
+                    return y;
+                case 180:
+                    return mSize - 1 - x;
+                case -90:
+                    return mSize - 1 - y;
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+
+        public int getY(int x, int y) {
+            switch (mAngle) {
+                case 0:
+                    return y;
+                case 90:
+                    return mSize - 1 - x;
+                case 180:
+                    return mSize - 1 - y;
+                case -90:
+                    return x;
+                default:
+                    throw new IllegalStateException();
+            }
+        }
     }
 }
