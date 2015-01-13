@@ -11,7 +11,7 @@ import kulku.ua.imagerotation.utils.Utils;
 class UsualRotator extends ImageRotator {
 
     @Override
-    public Bitmap rotateImage(Bitmap bitmap, int angleCcw) {
+    public Bitmap rotate(Bitmap bitmap, int angleCcw) {
         Utils.logHeap("UsualRotator before Rotation");
 
         Matrix mRotateMatrix = new Matrix();

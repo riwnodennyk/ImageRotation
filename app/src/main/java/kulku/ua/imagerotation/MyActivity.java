@@ -15,6 +15,7 @@ import kulku.ua.imagerotation.rotator.ImageRotator;
 
 import static java.util.Arrays.asList;
 import static kulku.ua.imagerotation.rotator.ImageRotator.ndk;
+import static kulku.ua.imagerotation.rotator.ImageRotator.pixelByPixel;
 import static kulku.ua.imagerotation.rotator.ImageRotator.renderScript;
 import static kulku.ua.imagerotation.rotator.ImageRotator.split;
 import static kulku.ua.imagerotation.rotator.ImageRotator.usual;
@@ -31,16 +32,17 @@ public class MyActivity extends Activity {
         setContentView(R.layout.activity_my);
         ImageView imageContainer = (ImageView) findViewById(R.id.image_container);
         File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "IMG_20141206_150847.jpg");
-        for (ImageRotator imageRotator : asList(renderScript(this), ndk(), split(), usual())) {
+        for (ImageRotator imageRotator : asList(renderScript(this), ndk(), split(), usual(), pixelByPixel())) {
             for (Integer angle : asList(90, 180)) {
                 Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
                 long l = System.currentTimeMillis();
-                imageRotator.rotateImage(bitmap, angle);
+                Bitmap rotated = imageRotator.rotate(bitmap, angle);
+
                 Log.d("Rotated to " + angle, "" + imageRotator.getClass().getSimpleName()
                         + " " + (System.currentTimeMillis() - l) + " ms");
+//                imageContainer.setImageBitmap(Utils.downscaleToMaximum(rotated));
             }
         }
-//        imageContainer.setImageBitmap(Utils.downscaleToMaximum(rotated));
     }
 
     @Override

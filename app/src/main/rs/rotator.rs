@@ -28,37 +28,37 @@ const flip_horizontally = 3;
 const flip_vertically = 4;
 
 uchar4 __attribute__ ((kernel)) transform (uchar4 in, uint32_t x, uint32_t y) {
-    uint32_t outX;
-    uint32_t outY;
+    uint32_t inX;
+    uint32_t inY;
     
     switch(direction)
     {
         case rotate_90_clockwise:
-        outX  = inWidth -1 - y;
-        outY = x;
+        inX  = inWidth - 1 - y;
+        inY = x;
         break;
 
         case rotate_180_clockwise:
-        outX = inWidth -1 - x;
-        outY = inHeight - 1 - y;
+        inX = inWidth - 1 - x;
+        inY = inHeight - 1 - y;
         break;
 
         case rotate_270_clockwise:
-        outX  = y;
-        outY = inHeight-1 - x;
+        inX  = y;
+        inY = inHeight - 1 - x;
         break;
 
         case flip_horizontally:
-        outX  =  inWidth-1 - x;
-        outY = y;
+        inX  =  inWidth - 1 - x;
+        inY = y;
         break;
 
         case flip_vertically:
-        outX  = x;
-        outY =  inHeight-1 - y;
+        inX  = x;
+        inY =  inHeight - 1 - y;
         break;
     }
     
-    const uchar4 *out = rsGetElementAt(inImage, outX, outY);
+    const uchar4 *out = rsGetElementAt(inImage, inX, inY);
     return *out;
 }

@@ -13,7 +13,7 @@ public class NdkRotator extends ImageRotator {
     JniBitmapHolder bitmapHolder = new JniBitmapHolder();
 
     @Override
-    public Bitmap rotateImage(Bitmap bitmap, int angleCcw) {
+    public Bitmap rotate(Bitmap bitmap, int angleCcw) {
         Utils.logHeap("NdkRotator before storeBitmap");
         bitmapHolder.storeBitmap(bitmap);
         bitmap.recycle();

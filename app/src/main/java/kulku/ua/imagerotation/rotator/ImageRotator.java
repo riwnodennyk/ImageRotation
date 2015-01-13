@@ -3,8 +3,6 @@ package kulku.ua.imagerotation.rotator;
 import android.content.Context;
 import android.graphics.Bitmap;
 
-import java.io.File;
-
 /**
  * Created by andrii.lavrinenko on 07.01.2015.
  */
@@ -31,18 +29,14 @@ public abstract class ImageRotator {
         return new UsualRotator();
     }
 
-    public static ImageRotator jni(File targetFile, Context context) {
-        throw new IllegalStateException("");
+    public static ImageRotator openGL() {
+        throw new IllegalStateException(""); //todo
     }
 
-    public static ImageRotator openGL(File targetFile, Context context) {
-        throw new IllegalStateException("");
+    public static ImageRotator pixelByPixel() {
+        return new PixelByPixelFileRotator();
     }
 
-    public static ImageRotator bitByBit(File targetFile, Context context) {
-        throw new IllegalStateException("");
-    }
-
-    public abstract android.graphics.Bitmap rotateImage(Bitmap bitmap, int angleCcw);
+    public abstract android.graphics.Bitmap rotate(Bitmap bitmap, int angleCcw);
 
 }

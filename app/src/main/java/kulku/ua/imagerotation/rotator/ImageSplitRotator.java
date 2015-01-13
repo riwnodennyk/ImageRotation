@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import kulku.ua.imagerotation.MyActivity;
+import kulku.ua.imagerotation.utils.Rotation;
 import kulku.ua.imagerotation.utils.Utils;
 
 /**
@@ -20,28 +21,27 @@ public class ImageSplitRotator extends ImageRotator {
 
     public static final String TAG = ImageSplitRotator.class.getSimpleName();
     public final int mRowsCols;
-    private final Matrix mRotateMatrix;
-    private final Rotation mRotation;
-    private int mOriginalHeight;
-    private int mOriginalWidth;
+    private Matrix mRotateMatrix;
+    private Rotation mRotation;
     private File[][] mRotatedPatches;
-    private int mChunkHeight;
-    private int mChunkWidth;
+    private int mAngleCcw;
+    private Bitmap mBitmap;
 
-    ImageSplitRotator(int angle) {
-        super(angle);
+    ImageSplitRotator() {
         mRowsCols = 3;
-
-        mRotateMatrix = new Matrix();
-        mRotateMatrix.postRotate(getAngle());
-
-        mRotation = new Rotation(getAngle(), mRowsCols);
     }
 
-    public Bitmap rotate(Bitmap bitmap) {
+    public Bitmap rotate(Bitmap bitmap, int angleCcw) {
+        mBitmap = bitmap;
+        mAngleCcw = angleCcw;
+        mRotateMatrix = new Matrix();
+        mRotateMatrix.postRotate(mAngleCcw);
+
+        mRotation = new Rotation(angleCcw, mRowsCols, mRowsCols);
+
         Bitmap combined = null;
         try {
-            splitOriginalBitmap(bitmap);
+            splitOriginalBitmap();
             combined = combineRotatedBitmap();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -50,28 +50,26 @@ public class ImageSplitRotator extends ImageRotator {
     }
 
 
-    private void splitOriginalBitmap(Bitmap bitmap) throws FileNotFoundException {
-        mOriginalHeight = bitmap.getHeight();
-        mOriginalWidth = bitmap.getWidth();
-
-        mChunkHeight = mOriginalHeight / mRowsCols;
-        mChunkWidth = mOriginalWidth / mRowsCols;
-
+    private void splitOriginalBitmap() throws FileNotFoundException {
         mRotatedPatches = new File[mRowsCols][mRowsCols];
-        for (int yCoord = 0, y = 0; y < mRowsCols; y++, yCoord += mChunkHeight) {
-            for (int xCoord = 0, x = 0; x < mRowsCols; x++, xCoord += mChunkWidth) {
-                Bitmap rotatedPatch = cutRotatedPatch(bitmap, xCoord, yCoord);
-                mRotatedPatches[x][y] = savePatch(rotatedPatch, x, y);
+
+        int chunkHeight = mBitmap.getHeight() / mRowsCols;
+        int chunkWidth = mBitmap.getWidth() / mRowsCols;
+        for (int yCoord = 0, y = 0; y < mRowsCols; y++, yCoord += chunkHeight) {
+            for (int xCoord = 0, x = 0; x < mRowsCols; x++, xCoord += chunkWidth) {
+                Bitmap cutRotatedPatch =
+                        Bitmap.createBitmap(mBitmap, xCoord, yCoord, chunkWidth, chunkHeight, mRotateMatrix, true);
+                mRotatedPatches[x][y] = savePatch(cutRotatedPatch, x, y);
             }
         }
         Utils.logHeap("splitOriginalBitmap");
-        bitmap.recycle();
+        mBitmap.recycle();
     }
 
 
     private Bitmap combineRotatedBitmap() throws FileNotFoundException {
-        int rotatedHeight = (getAngle() == 0 || getAngle() == 180) ? mOriginalHeight : mOriginalWidth;
-        int rotatedWidth = (getAngle() == 0 || getAngle() == 180) ? mOriginalWidth : mOriginalHeight;
+        int rotatedHeight = Utils.newHeight(mBitmap, mAngleCcw);
+        int rotatedWidth = Utils.newWidth(mBitmap, mAngleCcw);
 
         Bitmap rotatedBitmap = Bitmap.createBitmap(rotatedWidth, rotatedHeight,
                 Bitmap.Config.ARGB_8888);
@@ -116,52 +114,4 @@ public class ImageSplitRotator extends ImageRotator {
         return file;
     }
 
-    private Bitmap cutRotatedPatch(Bitmap bitmap, int xCoord, int yCoord) {
-        return Bitmap.createBitmap(bitmap, xCoord, yCoord, mChunkWidth, mChunkHeight, mRotateMatrix, true);
-    }
-
-    /**
-     * Created by aindrias on 06.01.2015.
-     */
-    public static class Rotation {
-
-        private int mAngle;
-        private int mSize;
-
-        public Rotation(int angle, int size) {
-            mAngle = angle;
-            mSize = size;
-            //                alpha => after[x][y] = before[cos(alpha)x - sin(alpha) y ][sin(alpha)x + cos(alpha)y];
-        }
-
-        public int getX(int x, int y) {
-            switch (mAngle) {
-                case 0:
-                    return x;
-                case 90:
-                    return y;
-                case 180:
-                    return mSize - 1 - x;
-                case -90:
-                    return mSize - 1 - y;
-                default:
-                    throw new IllegalStateException();
-            }
-        }
-
-        public int getY(int x, int y) {
-            switch (mAngle) {
-                case 0:
-                    return y;
-                case 90:
-                    return mSize - 1 - x;
-                case 180:
-                    return mSize - 1 - y;
-                case -90:
-                    return x;
-                default:
-                    throw new IllegalStateException();
-            }
-        }
-    }
 }

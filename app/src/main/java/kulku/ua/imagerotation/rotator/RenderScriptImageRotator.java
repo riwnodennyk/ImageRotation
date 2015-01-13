@@ -14,15 +14,14 @@ import ua.kulku.rs.ScriptC_rotator;
 public class RenderScriptImageRotator extends ImageRotator {
     public final Context mContext;
 
-    RenderScriptImageRotator(int angle, Context context) {
-        super(angle);
+    RenderScriptImageRotator(Context context) {
         mContext = context;
     }
 
     @Override
-    public Bitmap rotate(Bitmap bitmap) {
+    public Bitmap rotate(Bitmap bitmap, int angleCcw) {
         Utils.logHeap("before source decodeSource");
-        if (getAngle() == 0) return bitmap;
+        if (angleCcw == 0) return bitmap;
         Utils.logHeap("after source decodeSource");
 
         RenderScript rs = RenderScript.create(mContext);
@@ -37,15 +36,15 @@ public class RenderScriptImageRotator extends ImageRotator {
         bitmap.recycle();
         script.set_inImage(sourceAllocation);
 
-        int targetHeight = getAngle() == 180 ? bitmap.getHeight() : bitmap.getWidth();
-        int targetWidth = getAngle() == 180 ? bitmap.getWidth() : bitmap.getHeight();
+        int targetHeight = Utils.newHeight(bitmap, angleCcw);
+        int targetWidth = Utils.newWidth(bitmap, angleCcw);
         Bitmap.Config config = bitmap.getConfig();
         Bitmap target = Bitmap.createBitmap(targetWidth, targetHeight, config);
         final Allocation targetAllocation = Allocation.createFromBitmap(rs, target,
                 Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SCRIPT);
         Utils.logHeap("after Allocation createFromBitmap");
-        script.set_direction(getAngle());
+        script.set_direction(angleCcw);
         script.forEach_transform(targetAllocation, targetAllocation);
         Utils.logHeap("after rotateOperation");
         targetAllocation.copyTo(target);

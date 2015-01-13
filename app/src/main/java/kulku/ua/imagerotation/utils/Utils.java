@@ -42,4 +42,12 @@ public class Utils {
         }
         return Bitmap.createScaledBitmap(bitmap, width, height, false);
     }
+
+    public static int newHeight(Bitmap bitmap, int angleCcw) {
+        return angleCcw == 180 ? bitmap.getHeight() : bitmap.getWidth();
+    }
+
+    public static int newWidth(Bitmap bitmap, int angleCcw) {
+        return angleCcw == 180 ? bitmap.getWidth() : bitmap.getHeight();
+    }
 }
