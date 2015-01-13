@@ -6,10 +6,10 @@ import android.graphics.Matrix;
 import kulku.ua.imagerotation.utils.Utils;
 
 /**
- * Created by andrii.lavrinenko on 08.01.2015.
+ * Created by andrii.lavrinenko on 11.01.2015.
  */
-class UsualRotator extends ImageRotator {
-    public UsualRotator(int angle) {
+class JniRotator extends ImageRotator {
+    JniRotator(int angle) {
         super(angle);
     }
 
@@ -20,11 +20,13 @@ class UsualRotator extends ImageRotator {
         Matrix mRotateMatrix = new Matrix();
         mRotateMatrix.postRotate(getAngle());
 
-        Bitmap target = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(),
-                mRotateMatrix, true);
+        Bitmap target = getBitmap(bitmap, mRotateMatrix);
         bitmap.recycle();
         Utils.logHeap("after Rotation");
         return target;
     }
 
+    private Bitmap getBitmap(Bitmap bitmap, Matrix mRotateMatrix) {
+        return null;
+    }
 }

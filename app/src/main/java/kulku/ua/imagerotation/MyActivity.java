@@ -2,6 +2,7 @@ package kulku.ua.imagerotation;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,9 +30,10 @@ public class MyActivity extends Activity {
 //        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "IMG_20141206_144918.jpg");
         File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "IMG_20141206_140944.jpg");
 //        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "cloud.jpg");
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
+        ImageRotator imageRotator = ImageRotator.jni(this, 90);
         long l = System.currentTimeMillis();
-        ImageRotator imageRotator = ImageRotator.renderScript(file, this);
-        Bitmap bm = imageRotator.rotatedImage();
+        Bitmap bm = imageRotator.rotate(bitmap);
         Log.d("Rotated in", "" + imageRotator.getClass().getSimpleName() + " " + (System.currentTimeMillis() - l) + " ms");
 //        Bitmap bm = BitmapFactory.decodeFile(file.getPath());
 

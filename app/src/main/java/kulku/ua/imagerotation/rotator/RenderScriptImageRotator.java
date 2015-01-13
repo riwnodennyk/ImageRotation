@@ -5,11 +5,8 @@ import android.graphics.Bitmap;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
 
-import com.example.android.rs.hellocompute.ScriptC_flip;
-
-import java.io.File;
-
 import kulku.ua.imagerotation.utils.Utils;
+import ua.kulku.rs.ScriptC_rotator;
 
 /**
  * Created by andrii.lavrinenko on 07.01.2015.
@@ -17,51 +14,40 @@ import kulku.ua.imagerotation.utils.Utils;
 public class RenderScriptImageRotator extends ImageRotator {
     public final Context mContext;
 
-    RenderScriptImageRotator(File targetFile, int angle, Context context) {
-        super(targetFile, angle);
+    RenderScriptImageRotator(int angle, Context context) {
+        super(angle);
         mContext = context;
     }
 
-    RenderScriptImageRotator(File targetFile, Context context) {
-        this(targetFile, 270, context);
-    }
-
     @Override
-    public Bitmap rotatedImage() {
+    public Bitmap rotate(Bitmap bitmap) {
         Utils.logHeap("before source decodeSource");
-        Bitmap source = getOriginalBitmap();
-        if (getAngle() == 0) return source;
-        int targetHeight = getAngle() == 180 ? source.getHeight() : source.getWidth();
-        int targetWidth = getAngle() == 180 ? source.getWidth() : source.getHeight();
-        Bitmap.Config config = source.getConfig();
+        if (getAngle() == 0) return bitmap;
         Utils.logHeap("after source decodeSource");
 
         RenderScript rs = RenderScript.create(mContext);
         Utils.logHeap("after createRenderScript");
 
-        Utils.logHeap("before Allocation createFromBitmap");
-        ScriptC_flip script = new ScriptC_flip(rs);
-        script.set_sourceWidth(source.getWidth());
-        script.set_sourceHeight(source.getHeight());
-        Allocation sourceAllocation = Allocation.createFromBitmap(rs, source,
+        ScriptC_rotator script = new ScriptC_rotator(rs);
+        script.set_inWidth(bitmap.getWidth());
+        script.set_inHeight(bitmap.getHeight());
+        Allocation sourceAllocation = Allocation.createFromBitmap(rs, bitmap,
                 Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SCRIPT);
-        source.recycle();
-        script.set_sourceImage(sourceAllocation);
+        bitmap.recycle();
+        script.set_inImage(sourceAllocation);
 
+        int targetHeight = getAngle() == 180 ? bitmap.getHeight() : bitmap.getWidth();
+        int targetWidth = getAngle() == 180 ? bitmap.getWidth() : bitmap.getHeight();
+        Bitmap.Config config = bitmap.getConfig();
         Bitmap target = Bitmap.createBitmap(targetWidth, targetHeight, config);
         final Allocation targetAllocation = Allocation.createFromBitmap(rs, target,
                 Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SCRIPT);
         Utils.logHeap("after Allocation createFromBitmap");
         script.set_direction(getAngle());
-        script.forEach_flip(targetAllocation, targetAllocation);
+        script.forEach_transform(targetAllocation, targetAllocation);
         Utils.logHeap("after rotateOperation");
-
-
-        Utils.logHeap("before createTargetBitmap");
-        Utils.logHeap("after createTargetBitmap");
-
         targetAllocation.copyTo(target);
         Utils.logHeap("after copyTo");
 

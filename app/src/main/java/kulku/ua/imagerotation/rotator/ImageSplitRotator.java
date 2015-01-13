@@ -28,8 +28,8 @@ public class ImageSplitRotator extends ImageRotator {
     private int mChunkHeight;
     private int mChunkWidth;
 
-    ImageSplitRotator(File targetFile) {
-        super(targetFile, 90);
+    ImageSplitRotator(int angle) {
+        super(angle);
         mRowsCols = 3;
 
         mRotateMatrix = new Matrix();
@@ -38,10 +38,10 @@ public class ImageSplitRotator extends ImageRotator {
         mRotation = new Rotation(getAngle(), mRowsCols);
     }
 
-    public Bitmap rotatedImage() {
+    public Bitmap rotate(Bitmap bitmap) {
         Bitmap combined = null;
         try {
-            splitOriginalBitmap();
+            splitOriginalBitmap(bitmap);
             combined = combineRotatedBitmap();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -50,8 +50,7 @@ public class ImageSplitRotator extends ImageRotator {
     }
 
 
-    private void splitOriginalBitmap() throws FileNotFoundException {
-        Bitmap bitmap = getOriginalBitmap();
+    private void splitOriginalBitmap(Bitmap bitmap) throws FileNotFoundException {
         mOriginalHeight = bitmap.getHeight();
         mOriginalWidth = bitmap.getWidth();
 
@@ -86,27 +85,13 @@ public class ImageSplitRotator extends ImageRotator {
                 drawPatchOntoCanvas(canvas, x * rotatedChunkWidth, y * rotatedChunkHeight, file);
                 file.delete();
             }
-//        FileOutputStream stream = null;
-//        try {
-//            stream = new FileOutputStream(getOriginalFile());
-//            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-//        } finally {
-//            if (stream != null) {
-//                try {
-//                    stream.close();
-//                } catch (IOException e) {
-//                    // do nothing here
-//                }
-//            }
-//        }
         Utils.logHeap("combineRotatedBitmap");
         return rotatedBitmap;
     }
 
-
     private void drawPatchOntoCanvas(Canvas canvas, int xCoord, int yCoord, File patch) {
         Bitmap bitmap = BitmapFactory.decodeFile(patch.getPath());
-        canvas.drawBitmap(bitmap, xCoord, yCoord, null);
+        canvas.drawBitmap(bitmap, xCoord, yCoord, null);//todo try using matrix here
         bitmap.recycle();
     }
 
