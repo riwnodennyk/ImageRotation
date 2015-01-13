@@ -13,10 +13,15 @@ import java.io.File;
 
 import kulku.ua.imagerotation.rotator.ImageRotator;
 
+import static java.util.Arrays.asList;
+import static kulku.ua.imagerotation.rotator.ImageRotator.ndk;
+import static kulku.ua.imagerotation.rotator.ImageRotator.renderScript;
+import static kulku.ua.imagerotation.rotator.ImageRotator.split;
+import static kulku.ua.imagerotation.rotator.ImageRotator.usual;
+
 
 public class MyActivity extends Activity {
 
-    //    public static final String STORAGE_EMULATED_0_DCIM_CAMERA = "/storage/emulated/0/Download/";
     public static final String STORAGE_EMULATED_0_DCIM_CAMERA = "/storage/emulated/0/DCIM/Camera/";
     public static final float MAX_BITMAP_SIZE = 4096f;
 
@@ -25,32 +30,18 @@ public class MyActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
         ImageView imageContainer = (ImageView) findViewById(R.id.image_container);
-//        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "apple.png");
-//        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "house.jpg");
-//        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "IMG_20141206_144918.jpg");
-        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "IMG_20141206_140944.jpg");
-//        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "cloud.jpg");
-        Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
-        ImageRotator imageRotator = ImageRotator.jni(this, 90);
-        long l = System.currentTimeMillis();
-        Bitmap bm = imageRotator.rotate(bitmap);
-        Log.d("Rotated in", "" + imageRotator.getClass().getSimpleName() + " " + (System.currentTimeMillis() - l) + " ms");
-//        Bitmap bm = BitmapFactory.decodeFile(file.getPath());
-
-        int height = bm.getHeight();
-        int width = bm.getWidth();
-        if (height > MAX_BITMAP_SIZE) {
-            width *= MAX_BITMAP_SIZE / height;
-            height = (int) MAX_BITMAP_SIZE;
+        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "IMG_20141206_150847.jpg");
+        for (ImageRotator imageRotator : asList(renderScript(this), ndk(), split(), usual())) {
+            for (Integer angle : asList(90, 180)) {
+                Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
+                long l = System.currentTimeMillis();
+                imageRotator.rotateImage(bitmap, angle);
+                Log.d("Rotated to " + angle, "" + imageRotator.getClass().getSimpleName()
+                        + " " + (System.currentTimeMillis() - l) + " ms");
+            }
         }
-        if (width > MAX_BITMAP_SIZE) {
-            height *= MAX_BITMAP_SIZE / width;
-            width = (int) MAX_BITMAP_SIZE;
-        }
-        bm = Bitmap.createScaledBitmap(bm, width, height, false);
-        imageContainer.setImageBitmap(bm);
+//        imageContainer.setImageBitmap(Utils.downscaleToMaximum(rotated));
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

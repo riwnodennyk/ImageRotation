@@ -1,0 +1,18 @@
+apply plugin: 'com.android.library'
+
+version '0.0.1'
+group 'com.jni.bitmap_operations'
+
+android {
+    compileSdkVersion propCompileSdkVersion
+    buildToolsVersion propBuildToolsVersion
+
+
+    defaultConfig {
+        ndk {
+            moduleName "JniBitmapOperationsLibrary"
+            ldLibs "log", "jnigraphics"
+            abiFilters "x86", "armeabi-v7a"
+        }
+    }
+}

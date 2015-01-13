@@ -1,10 +1,12 @@
 package kulku.ua.imagerotation.utils;
 
+import android.graphics.Bitmap;
 import android.os.Debug;
 import android.util.Log;
 
 import java.text.DecimalFormat;
 
+import kulku.ua.imagerotation.MyActivity;
 import kulku.ua.imagerotation.rotator.ImageRotator;
 
 /**
@@ -25,5 +27,19 @@ public class Utils {
                 + df.format((double) (Runtime.getRuntime().totalMemory() / 1048576))
                 + "MB of " + df.format((double) (Runtime.getRuntime().maxMemory() / 1048576))
                 + "MB (" + df.format((double) (Runtime.getRuntime().freeMemory() / 1048576)) + "MB free)");
+    }
+
+    public static Bitmap downscaleToMaximum(Bitmap bitmap) {
+        int height = bitmap.getHeight();
+        int width = bitmap.getWidth();
+        if (height > MyActivity.MAX_BITMAP_SIZE) {
+            width *= MyActivity.MAX_BITMAP_SIZE / height;
+            height = (int) MyActivity.MAX_BITMAP_SIZE;
+        }
+        if (width > MyActivity.MAX_BITMAP_SIZE) {
+            height *= MyActivity.MAX_BITMAP_SIZE / width;
+            width = (int) MyActivity.MAX_BITMAP_SIZE;
+        }
+        return Bitmap.createScaledBitmap(bitmap, width, height, false);
     }
 }
