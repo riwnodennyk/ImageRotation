@@ -34,24 +34,24 @@ uchar4 __attribute__ ((kernel)) flip (uchar4 in, uint32_t x, uint32_t y) {
 switch(direction)
 {
 case rotate_90_clockwise:
-                 sourceX  = sourceWidth - y;
+                 sourceX  = sourceWidth - 1 - y;
               sourceY = x;
               break;
 case rotate_180_clockwise:
-   sourceX  = sourceWidth - x;
-sourceY = sourceHeight - y;
+   sourceX  =sourceWidth - 1 - x;
+sourceY =  sourceHeight - 1 - y;
               break;
 case rotate_270_clockwise:
    sourceX  = y;
-sourceY = sourceHeight - x;
+sourceY = sourceHeight - 1 - x;
               break;
 case flip_horizontally:
-   sourceX  =  sourceWidth - x;
+   sourceX  =  sourceWidth - 1 - x;
 sourceY = y;
               break;
 case flip_vertically:
    sourceX  = x;
-sourceY =  sourceHeight - y;
+sourceY =  sourceHeight - 1 - y;
               break;
 }
 

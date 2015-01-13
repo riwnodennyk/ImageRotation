@@ -20,28 +20,29 @@ public class ImageSplitRotator extends ImageRotator {
 
     public static final String TAG = ImageSplitRotator.class.getSimpleName();
     public final int mRowsCols;
-    private final Matrix mRotateMatrix;
-    private final Rotation mRotation;
+    private Matrix mRotateMatrix;
+    private Rotation mRotation;
     private int mOriginalHeight;
     private int mOriginalWidth;
     private File[][] mRotatedPatches;
     private int mChunkHeight;
     private int mChunkWidth;
+    private int mAngleClockwise;
 
-    ImageSplitRotator(File targetFile) {
-        super(targetFile, 90);
+    ImageSplitRotator() {
+        super();
         mRowsCols = 3;
-
-        mRotateMatrix = new Matrix();
-        mRotateMatrix.postRotate(getAngle());
-
-        mRotation = new Rotation(getAngle(), mRowsCols);
     }
 
-    public Bitmap rotatedImage() {
+    public Bitmap rotateImage(Bitmap bitmap, int angleCcw) {
+        mRotateMatrix = new Matrix();
+        mRotateMatrix.postRotate(angleCcw);
+        mRotation = new Rotation(angleCcw, mRowsCols);
+        mAngleClockwise = angleCcw;
+
         Bitmap combined = null;
         try {
-            splitOriginalBitmap();
+            splitOriginalBitmap(bitmap);
             combined = combineRotatedBitmap();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -50,8 +51,7 @@ public class ImageSplitRotator extends ImageRotator {
     }
 
 
-    private void splitOriginalBitmap() throws FileNotFoundException {
-        Bitmap bitmap = getOriginalBitmap();
+    private void splitOriginalBitmap(Bitmap bitmap) throws FileNotFoundException {
         mOriginalHeight = bitmap.getHeight();
         mOriginalWidth = bitmap.getWidth();
 
@@ -71,8 +71,8 @@ public class ImageSplitRotator extends ImageRotator {
 
 
     private Bitmap combineRotatedBitmap() throws FileNotFoundException {
-        int rotatedHeight = (getAngle() == 0 || getAngle() == 180) ? mOriginalHeight : mOriginalWidth;
-        int rotatedWidth = (getAngle() == 0 || getAngle() == 180) ? mOriginalWidth : mOriginalHeight;
+        int rotatedHeight = (mAngleClockwise == 0 || mAngleClockwise == 180) ? mOriginalHeight : mOriginalWidth;
+        int rotatedWidth = (mAngleClockwise == 0 || mAngleClockwise == 180) ? mOriginalWidth : mOriginalHeight;
 
         Bitmap rotatedBitmap = Bitmap.createBitmap(rotatedWidth, rotatedHeight,
                 Bitmap.Config.ARGB_8888);
