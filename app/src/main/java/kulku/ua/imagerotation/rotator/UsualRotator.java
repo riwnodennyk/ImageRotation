@@ -18,7 +18,8 @@ class UsualRotator extends ImageRotator {
         mRotateMatrix.postRotate(-angleCcw);
         Bitmap target = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(),
                 mRotateMatrix, true);
-        bitmap.recycle();
+        if (angleCcw != 0)
+            bitmap.recycle();
         Utils.logHeap("UsualRotator after Rotation");
         return target;
     }

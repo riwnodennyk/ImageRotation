@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/ImageRotation.iml" filepath="$PROJECT_DIR$/ImageRotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/ndklib/ndklib.iml" filepath="$PROJECT_DIR$/ndklib/ndklib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ndklib/ndklib.iml" filepath="$PROJECT_DIR$/ndklib/ndklib.iml" />
     </modules>
   </component>
 </project>

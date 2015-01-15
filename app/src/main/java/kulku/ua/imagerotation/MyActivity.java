@@ -9,40 +9,46 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-import java.io.File;
-
 import kulku.ua.imagerotation.rotator.ImageRotator;
+import kulku.ua.imagerotation.utils.Utils;
 
 import static java.util.Arrays.asList;
 import static kulku.ua.imagerotation.rotator.ImageRotator.ndk;
-import static kulku.ua.imagerotation.rotator.ImageRotator.pixelByPixel;
 import static kulku.ua.imagerotation.rotator.ImageRotator.renderScript;
-import static kulku.ua.imagerotation.rotator.ImageRotator.split;
 import static kulku.ua.imagerotation.rotator.ImageRotator.usual;
 
 
 public class MyActivity extends Activity {
 
     public static final String STORAGE_EMULATED_0_DCIM_CAMERA = "/storage/emulated/0/DCIM/Camera/";
+    public static final String PATH = STORAGE_EMULATED_0_DCIM_CAMERA + "IMG_20141206_150847.jpg";
     public static final float MAX_BITMAP_SIZE = 4096f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-        ImageView imageContainer = (ImageView) findViewById(R.id.image_container);
-        File file = new File(STORAGE_EMULATED_0_DCIM_CAMERA + "IMG_20141206_150847.jpg");
-        for (ImageRotator imageRotator : asList(renderScript(this), ndk(), split(), usual(), pixelByPixel())) {
-            for (Integer angle : asList(90, 180)) {
-                Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
-                long l = System.currentTimeMillis();
-                Bitmap rotated = imageRotator.rotate(bitmap, angle);
+        testDrive();
+//        setImage();
+    }
 
+    private void testDrive() {
+//        while(true)
+        for (ImageRotator imageRotator : asList(renderScript(this), ndk(), usual())) {
+            for (Integer angle : asList(0, 90, 180, 270)) {
+                Bitmap bitmap = BitmapFactory.decodeFile(PATH);
+                long l = System.currentTimeMillis();
+                imageRotator.rotate(bitmap, angle);
                 Log.d("Rotated to " + angle, "" + imageRotator.getClass().getSimpleName()
                         + " " + (System.currentTimeMillis() - l) + " ms");
-//                imageContainer.setImageBitmap(Utils.downscaleToMaximum(rotated));
             }
         }
+    }
+
+    private void setImage() {
+        ImageView imageContainer = (ImageView) findViewById(R.id.image_container);
+        Bitmap bitmap = BitmapFactory.decodeFile(PATH);
+        imageContainer.setImageBitmap(Utils.downscaleToMaximum(usual().rotate(bitmap, 270)));
     }
 
     @Override

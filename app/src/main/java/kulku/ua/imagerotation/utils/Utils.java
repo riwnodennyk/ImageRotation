@@ -30,6 +30,8 @@ public class Utils {
     }
 
     public static Bitmap downscaleToMaximum(Bitmap bitmap) {
+        if (bitmap.isRecycled())
+            throw new IllegalArgumentException("A recycled bitmap " + bitmap);
         int height = bitmap.getHeight();
         int width = bitmap.getWidth();
         if (height > MyActivity.MAX_BITMAP_SIZE) {
@@ -44,10 +46,10 @@ public class Utils {
     }
 
     public static int newHeight(Bitmap bitmap, int angleCcw) {
-        return angleCcw == 180 ? bitmap.getHeight() : bitmap.getWidth();
+        return angleCcw == 0 || angleCcw == 180 ? bitmap.getHeight() : bitmap.getWidth();
     }
 
     public static int newWidth(Bitmap bitmap, int angleCcw) {
-        return angleCcw == 180 ? bitmap.getWidth() : bitmap.getHeight();
+        return angleCcw == 0 || angleCcw == 180 ? bitmap.getWidth() : bitmap.getHeight();
     }
 }

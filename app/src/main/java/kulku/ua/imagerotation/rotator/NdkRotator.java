@@ -30,6 +30,7 @@ public class NdkRotator extends ImageRotator {
                 break;
         }
         Utils.logHeap("NdkRotator after rotate");
+
         Bitmap bitmapAndFree = bitmapHolder.getBitmapAndFree();
         Utils.logHeap("NdkRotator after getBitmapAndFree");
         return bitmapAndFree;

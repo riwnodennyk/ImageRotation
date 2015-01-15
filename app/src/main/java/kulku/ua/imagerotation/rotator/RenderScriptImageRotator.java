@@ -44,8 +44,17 @@ public class RenderScriptImageRotator extends ImageRotator {
                 Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SCRIPT);
         Utils.logHeap("after Allocation createFromBitmap");
-        script.set_direction(angleCcw);
-        script.forEach_transform(targetAllocation, targetAllocation);
+        switch (angleCcw) {
+            case 90:
+                script.forEach_rotate_90_clockwise(targetAllocation, targetAllocation);
+                break;
+            case 180:
+                script.forEach_flip_vertically(targetAllocation, targetAllocation);
+                break;
+            case 270:
+                script.forEach_rotate_270_clockwise(targetAllocation, targetAllocation);
+                break;
+        }
         Utils.logHeap("after rotateOperation");
         targetAllocation.copyTo(target);
         Utils.logHeap("after copyTo");
