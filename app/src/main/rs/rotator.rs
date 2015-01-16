@@ -13,18 +13,12 @@ uchar4 __attribute__ ((kernel)) rotate_90_clockwise (uchar4 in, uint32_t x, uint
 }
 
 uchar4 __attribute__ ((kernel)) rotate_180_clockwise (uchar4 in, uint32_t x, uint32_t y) {
-//if(y >= inHeight){
-//return in;}
-//else{
-        //uint32_t tempPixel = pixels2[width * y + x];
-        //pixels2[width * y + x] = pixels[whereToGet];
-        //pixels[whereToGet] = tempPixel;
-//}
     uint32_t inX = inWidth - 1 - x;
     uint32_t inY = inHeight - 1 - y;
 
     const uchar4 *out = rsGetElementAt(inImage, inX, inY);
     return *out;
+    return in;
 }
 
 uchar4 __attribute__ ((kernel)) rotate_270_clockwise (uchar4 in, uint32_t x, uint32_t y) {
@@ -36,7 +30,7 @@ uchar4 __attribute__ ((kernel)) rotate_270_clockwise (uchar4 in, uint32_t x, uin
 }
 
 uchar4 __attribute__ ((kernel)) flip_horizontally (uchar4 in, uint32_t x, uint32_t y) {
-    uint32_t inX  =  inWidth - 1 - x;
+    uint32_t inX = inWidth - 1 - x;
     uint32_t inY = y;
 
     const uchar4 *out = rsGetElementAt(inImage, inX, inY);
@@ -44,8 +38,8 @@ uchar4 __attribute__ ((kernel)) flip_horizontally (uchar4 in, uint32_t x, uint32
 }
 
 uchar4 __attribute__ ((kernel)) flip_vertically (uchar4 in, uint32_t x, uint32_t y) {
-    uint32_t inX  = x;
-    uint32_t inY =  inHeight - 1 - y;
+    uint32_t inX = x;
+    uint32_t inY = inHeight - 1 - y;
 
     const uchar4 *out = rsGetElementAt(inImage, inX, inY);
     return *out;

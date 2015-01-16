@@ -7,8 +7,9 @@ import android.graphics.Bitmap;
  * Created by andrii.lavrinenko on 07.01.2015.
  */
 public abstract class ImageRotator {
-
     public static final String TAG = "ImageRotator";
+    public final static int FLIP_VERTICAL = -1;
+    public final static int FLIP_HORIZONTAL = -2;
 
     public ImageRotator() {
     }

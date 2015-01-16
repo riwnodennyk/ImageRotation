@@ -174,8 +174,18 @@ JNIEXPORT void JNICALL Java_com_jni_bitmap_1operations_JniBitmapHolder_jniRotate
     // 5678>ba09
     // 90ab>8765
     // cdef 4321
+
+//    for (int x = 0; x < width; ++x)
+//    for (int x = width - 1; x >=0; --x)
+//    for (int y = 0; y < height; ++y)
+//    for (int y = height - 1; y >=0; --y)
+//    {
+//            uint32_t pixel = pixels2[width * height - 1 - width*y - x];
+//        pixels2[width * y + x] = pixel;
+//    }
+
     int whereToGet = 0;
-    for (int y = height - 1; y >= height / 2; --y)
+    for (int y = height - 1; y >= height/2; --y)
     for (int x = width - 1; x >= 0; --x)
     {
         //take from each row (up to bottom), from left to right

@@ -45,6 +45,12 @@ public class RenderScriptImageRotator extends ImageRotator {
                 Allocation.USAGE_SCRIPT);
         Utils.logHeap("after Allocation createFromBitmap");
         switch (angleCcw) {
+            case FLIP_HORIZONTAL:
+                script.forEach_flip_horizontally(targetAllocation, targetAllocation);
+                break;
+            case FLIP_VERTICAL:
+                script.forEach_flip_vertically(targetAllocation, targetAllocation);
+                break;
             case 90:
                 script.forEach_rotate_90_clockwise(targetAllocation, targetAllocation);
                 break;

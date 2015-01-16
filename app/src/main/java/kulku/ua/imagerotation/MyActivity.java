@@ -13,6 +13,8 @@ import kulku.ua.imagerotation.rotator.ImageRotator;
 import kulku.ua.imagerotation.utils.Utils;
 
 import static java.util.Arrays.asList;
+import static kulku.ua.imagerotation.rotator.ImageRotator.FLIP_HORIZONTAL;
+import static kulku.ua.imagerotation.rotator.ImageRotator.FLIP_VERTICAL;
 import static kulku.ua.imagerotation.rotator.ImageRotator.ndk;
 import static kulku.ua.imagerotation.rotator.ImageRotator.renderScript;
 import static kulku.ua.imagerotation.rotator.ImageRotator.usual;
@@ -34,8 +36,8 @@ public class MyActivity extends Activity {
 
     private void testDrive() {
 //        while(true)
-        for (ImageRotator imageRotator : asList(renderScript(this), ndk(), usual())) {
-            for (Integer angle : asList(0, 90, 180, 270)) {
+        for (ImageRotator imageRotator : asList(renderScript(this), ndk())) {
+            for (Integer angle : asList(90, 180, FLIP_HORIZONTAL, FLIP_VERTICAL)) {
                 Bitmap bitmap = BitmapFactory.decodeFile(PATH);
                 long l = System.currentTimeMillis();
                 imageRotator.rotate(bitmap, angle);

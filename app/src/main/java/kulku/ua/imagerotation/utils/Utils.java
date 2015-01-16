@@ -46,10 +46,10 @@ public class Utils {
     }
 
     public static int newHeight(Bitmap bitmap, int angleCcw) {
-        return angleCcw == 0 || angleCcw == 180 ? bitmap.getHeight() : bitmap.getWidth();
+        return angleCcw == 90 || angleCcw == 270 ? bitmap.getWidth() : bitmap.getHeight();
     }
 
     public static int newWidth(Bitmap bitmap, int angleCcw) {
-        return angleCcw == 0 || angleCcw == 180 ? bitmap.getWidth() : bitmap.getHeight();
+        return angleCcw == 90 || angleCcw == 270 ? bitmap.getHeight() : bitmap.getWidth();
     }
 }

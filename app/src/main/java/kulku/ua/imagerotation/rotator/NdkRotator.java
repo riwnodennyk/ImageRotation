@@ -19,6 +19,12 @@ public class NdkRotator extends ImageRotator {
         bitmap.recycle();
         Utils.logHeap("NdkRotator after storeBitmap");
         switch (angleCcw) {
+            case FLIP_HORIZONTAL:
+                bitmapHolder.flipBitmapHorizontal();
+                break;
+            case FLIP_VERTICAL:
+                bitmapHolder.flipBitmapVertical();
+                break;
             case 90:
                 bitmapHolder.rotateBitmapCcw90();
                 break;
